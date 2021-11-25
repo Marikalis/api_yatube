@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from django.core.exceptions import PermissionDenied
+#from django.core.exceptions import PermissionDenied
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -22,11 +22,19 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def perform_destroy(self, instance):
+        if instance.author != self.request.user:
+            raise exceptions.PermissionDenied(
+                'Удаление чужого контента запрещено')
+        instance.delete()
+
     def get_queryset(self):
         # получаем список всех комментариев поста с
-        id = self.kwargs.get('post_id')
-        new_queryset = Comment.objects.filter(post=id)
-        return new_queryset
+        post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
+        return post.comments
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -42,3 +50,9 @@ class GroupViewSet(viewsets.ModelViewSet):
 #   
 #   if user != post.author:
 #       return Response(status=status.HTTP_403_FORBIDDEN)
+
+    #def get_queryset(self):
+        # получаем список всех комментариев поста с
+        #id = self.kwargs.get('post_id')
+        #new_queryset = Comment.objects.filter(post=id)
+        #return new_queryset

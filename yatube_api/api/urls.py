@@ -9,22 +9,17 @@ router = SimpleRouter()
 router.register(r'api/v1/posts', PostViewSet)
 router.register(r'api/v1/groups', GroupViewSet)
 router.register(
-    r'api/v1/posts/(?P<pk>\d+)/comments', 
+    r'api/v1/posts/(?P<post_id>\d+)/comments',
     CommentViewSet,
-    basename='comments'
+    basename='post_id'
+)
+router.register(
+    r'api/v1/posts/(?P<post_id>\d+)/comments/(?P<comment_id>\d+)/',
+    CommentViewSet,
+    basename='comment_id'
 )
 
 urlpatterns = [
     path('api/v1/api-token-auth/', views.obtain_auth_token),
     path('', include(router.urls)),
 ]
-
-#urlpatterns = [
-    #path('api/v1/api-token-auth/', views.obtain_auth_token),
-    #path('api/v1/posts/', api_posts),
-    #path('api/v1/posts/<int:pk>/', api_posts_detail),
-    #path('api/v1/groups/', #api_posts_detail),
-    #path('api/v1/groups/<int:pk>/', #api_posts_detail),
-    #path('api/v1/posts/<int:pk>/comments/', #api_posts_detail),
-    #path('api/v1/posts/<int:pk>/comments/<int:pk>/', #api_posts_detail),
-#]

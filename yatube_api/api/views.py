@@ -1,7 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
-from rest_framework.response import Response
+from rest_framework import viewsets
 
 from .serializers import CommentSerializer, GroupSerializer, PostSerializer
 from posts.models import Group, Post
@@ -35,7 +34,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
+        serializer.save(author=self.request.user, post=post)
 
     def perform_update(self, serializer):
         if serializer.instance.author != self.request.user:
@@ -49,14 +49,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         instance.delete()
 
     def get_queryset(self):
-        # получаем список всех комментариев поста с
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         return post.comments
 
 
-class GroupViewSet(viewsets.ModelViewSet):
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-
-    def create(self, serializer):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

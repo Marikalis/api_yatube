@@ -23,14 +23,16 @@ class Post(models.Model):
     )
     image = models.ImageField(
         upload_to='posts/', null=True, blank=True
-    )  # поле для картинки
+    )
     group = models.ForeignKey(
-        Group, on_delete=models.CASCADE,
+        Group, on_delete=models.SET_NULL,
         related_name="posts", blank=True, null=True
     )
 
     def __str__(self):
-        return self.text
+        return (f"{self.text[:30]} | "
+                f"{self.pub_date.strftime('%m/%d/%Y')} | "
+                f"{self.author}")
 
 
 class Comment(models.Model):

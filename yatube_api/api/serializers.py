@@ -24,7 +24,6 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
-    default = serializers.CurrentUserDefault()
 
     class Meta:
         fields = '__all__'
